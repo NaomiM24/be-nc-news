@@ -18,7 +18,19 @@ exports.makeRefObj = list => {
 };
 
 exports.formatComments = (comments, articleRef) => {
-  const refObj = {};
+  console.log(comments)
+  const formattedComments = [];
+  comments.forEach((item, i) => {
+    const comment = {...item}
+    formattedComments.push(comment)
+    formattedComments[i].author = comment.created_by;
+    formattedComments[i].article_id = articleRef[comment.belongs_to]
+    formattedComments[i].created_at = new Date(formattedComments[i].created_at)
+    delete formattedComments[i].created_by
+    delete formattedComments[i].belongs_to
+  })
+  console.log(formattedComments)
+  return formattedComments
 };
 
 /*## formatComments
