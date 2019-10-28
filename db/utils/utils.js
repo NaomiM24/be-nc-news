@@ -1,5 +1,10 @@
 exports.formatDates = list => {
-  const convertedDate = list.map(item => new Date(item))
+  const convertedDate = [];
+  list.forEach((item, i) => {
+    const obj = {...item}
+    convertedDate.push(obj)
+    convertedDate[i].created_at = new Date(convertedDate[i].created_at)
+  })
   console.log(convertedDate)
   return convertedDate
 };
@@ -14,7 +19,6 @@ exports.makeRefObj = list => {
 
 exports.formatComments = (comments, articleRef) => {
   const refObj = {};
-  
 };
 
 /*## formatComments

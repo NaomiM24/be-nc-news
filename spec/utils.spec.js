@@ -5,19 +5,67 @@ const {
   formatComments,
 } = require('../db/utils/utils');
 
-describe('formatDates', () => {
-  it('returns a new empty array when passed an empty array', () => {
+describe.only('formatDates', () => {
+  it('returns an empty array when passed an empty array', () => {
     expect(formatDates([])).to.eql([])
   })
-  it('returns an array with one converted data when passed an array with one date obect', () => {
-    expect(formatDates([1542284514171])).to.eql([new Date(1542284514171)])
+  it('returns a new array', () => {
+    const input = []
+    expect(formatDates(input)).to.not.equal(input)
+  })
+  it('returns an array with one converted date when passed an array with one date obect', () => {
+    const input = [{ title: 'Living in the shadow of a great man',
+    topic: 'mitch',
+    author: 'butter_bridge',
+    body: 'I find this existence challenging',
+    created_at: 1542284514171,
+    votes: 100
+  }];
+    expect(formatDates(input)).to.eql([{ title: 'Living in the shadow of a great man',
+    topic: 'mitch',
+    author: 'butter_bridge',
+    body: 'I find this existence challenging',
+    created_at: new Date(1542284514171),
+    votes: 100
+  }])
   })
   it('returns a new array', () => {
-    const input = [1542284514171]
+    const input = [{ title: 'Living in the shadow of a great man',
+    topic: 'mitch',
+    author: 'butter_bridge',
+    body: 'I find this existence challenging',
+    created_at: 1542284514171,
+    votes: 100 
+  }];
     expect(formatDates(input)).to.not.eql(input)
   })
   it('returns a new array with more than one converted data when passed an array with more than one date obect', () => {
-    expect(formatDates([1542284514171, 1416140514171])).to.eql([new Date(1542284514171), new Date(1416140514171)])
+    const input = [{ title: 'Living in the shadow of a great man',
+    topic: 'mitch',
+    author: 'butter_bridge',
+    body: 'I find this existence challenging',
+    created_at: 1542284514171,
+    votes: 100
+  },
+  {
+      title: 'Eight pug gifs that remind me of mitch',
+      topic: 'mitch',
+      author: 'icellusedkars',
+      body: 'some gifs',
+      created_at: 1289996514171,
+    }]
+    expect(formatDates(input)).to.eql([{ title: 'Living in the shadow of a great man',
+    topic: 'mitch',
+    author: 'butter_bridge',
+    body: 'I find this existence challenging',
+    created_at: new Date(1542284514171),
+    votes: 100
+  }, { title: 'Eight pug gifs that remind me of mitch',
+    topic: 'mitch',
+    author: 'icellusedkars',
+    body: 'some gifs',
+    created_at: new Date(1289996514171),
+  }]);
   })
 });
 
