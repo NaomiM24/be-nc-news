@@ -22,6 +22,19 @@ describe('/api', () => {
         )
       })
     })
+    describe('ERRORS', () => {
+      it('405 INVALID METHODS', () => {
+        const invalidMethods = ['patch', 'put', 'delete'];
+        const methodPromises = invalidMethods.map((method) => {
+          return request(app)[method]('/api/topics')
+          .expect(405)
+          .then(({body: {msg}})=>{
+            expect(msg).to.equal('method not allowed')
+          })
+        });
+        return Promise.all(methodPromises)
+      });
+    });
   })
   describe('/users', () => {
     it('GET: 200, returns all users', () => {
@@ -47,6 +60,16 @@ describe('/api', () => {
               avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4',
               name: 'sam' } })
         })
+      });
+      describe('ERRORS', () => {
+        it('GET: 404 when username does not exist', () => {
+          return request(app)
+          .get('/api/users/blob')
+          .expect(404)
+          .then(({body}) => {
+            expect(body.msg).to.eql('username does not exist')
+          })
+        });
       });
     });
   });

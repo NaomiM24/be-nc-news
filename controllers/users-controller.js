@@ -9,6 +9,7 @@ exports.getUsers = (req, res, next) => {
 exports.getUserByUsername = (req, res, next) => {
   const {username} = req.params
   fetchUserByUsername(username).then(user => {
-    res.status(200).send({user})
-  })
+    if (user) res.status(200).send({user})
+    // else 
+  }).catch(next);
 }

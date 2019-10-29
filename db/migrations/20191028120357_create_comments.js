@@ -13,6 +13,6 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  console.log('dropped comments table');
+  // console.log('dropped comments table');
   return knex.schema.dropTable('comments');
 };

@@ -9,6 +9,6 @@
 };
 
 exports.down = function(knex) {
-  console.log('dropped user tables');
+  // console.log('dropped user tables');
   return knex.schema.dropTable('users');
 };

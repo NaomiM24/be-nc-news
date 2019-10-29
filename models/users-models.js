@@ -7,7 +7,14 @@ exports.fetchUsers = () => {
 
 exports.fetchUserByUsername = (username) => {
   return connection('users').first('*').where({username})
-  //.select('*').from('users').where({username})
+  .then(user => {
+    if (!user)
+      return Promise.reject({
+      status: 404,
+      msg: "username does not exist"
+    })
+    return user
+  })
   
   
 }
