@@ -49,6 +49,19 @@ describe('/api', () => {
         )
       })
     });
+    describe('ERRORS', () => {
+      it('405 INVALID METHODS', () => {
+        const invalidMethods = ['patch', 'put', 'delete'];
+        const methodPromises = invalidMethods.map((method) => {
+          return request(app)[method]('/api/users')
+          .expect(405)
+          .then(({body: {msg}})=>{
+            expect(msg).to.equal('method not allowed')
+          })
+        });
+        return Promise.all(methodPromises)
+      });
+    });
     describe('/:username', () => {
       it('GET: 200, returns user with given username', () => {
         return request(app)
@@ -69,6 +82,17 @@ describe('/api', () => {
           .then(({body}) => {
             expect(body.msg).to.eql('username does not exist')
           })
+        });
+        it('405 INVALID METHODS', () => {
+          const invalidMethods = ['patch', 'put', 'delete'];
+          const methodPromises = invalidMethods.map((method) => {
+            return request(app)[method]('/api/users/blob')
+            .expect(405)
+            .then(({body: {msg}})=>{
+              expect(msg).to.equal('method not allowed')
+            })
+          });
+          return Promise.all(methodPromises)
         });
       });
     });
