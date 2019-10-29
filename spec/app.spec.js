@@ -36,5 +36,18 @@ describe('/api', () => {
         )
       })
     });
+    describe('/:username', () => {
+      it('GET: 200, returns user with given username', () => {
+        return request(app)
+        .get('/api/users/icellusedkars')
+        .expect(200)
+        .then(({body}) => {
+          expect(body).to.eql({ user: 
+            { username: 'icellusedkars',
+              avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4',
+              name: 'sam' } })
+        })
+      });
+    });
   });
 })
