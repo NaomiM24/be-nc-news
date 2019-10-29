@@ -5,7 +5,7 @@ exports.formatDates = list => {
     convertedDate.push(obj)
     convertedDate[i].created_at = new Date(convertedDate[i].created_at)
   })
-  console.log(convertedDate)
+  //console.log(convertedDate)
   return convertedDate
 };
 
@@ -18,7 +18,7 @@ exports.makeRefObj = list => {
 };
 
 exports.formatComments = (comments, articleRef) => {
-  console.log(comments)
+  //console.log(comments)
   const formattedComments = [];
   comments.forEach((item, i) => {
     const comment = {...item}
@@ -29,7 +29,7 @@ exports.formatComments = (comments, articleRef) => {
     delete formattedComments[i].created_by
     delete formattedComments[i].belongs_to
   })
-  console.log(formattedComments)
+  //console.log(formattedComments)
   return formattedComments
 };
 
