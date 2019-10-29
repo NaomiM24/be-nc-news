@@ -97,4 +97,55 @@ describe('/api', () => {
       });
     });
   });
+  describe.only('/articles', () => {
+    describe('/:article_id', () => {
+      it('GET 200, returns an article object with author as the username from users table and comment_count which is the total count of all comments with this article_id', () => {
+        return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then(({body}) => {
+          //console.log(body)
+
+          expect(body).to.eql({article: { 
+            article_id: 1,
+            title: 'Living in the shadow of a great man',
+            body: 'I find this existence challenging',
+            votes: 100,
+            topic: 'mitch',
+            author: 'butter_bridge',
+            created_at: "2018-11-15T12:21:54.171Z",
+            comment_count: '13' }});
+      });
+    });
+    describe('ERRORS', () => {
+      it('GET: 404 when article id does not exist', () => {
+        return request(app)
+          .get('/api/articles/194')
+          .expect(404)
+          .then(({body}) => {
+            expect(body.msg).to.eql('article does not exist')
+          })
+      });
+      it('GET: 400 when article id is invalid', () => {
+        return request(app)
+        .get('/api/articles/helpmeplease')
+          .expect(400)
+          .then(({body}) => {
+            expect(body.msg).to.eql('invalid input syntax for integer: "helpmeplease"')
+          })
+      })
+      it('405 INVALID METHODS', () => {
+        const invalidMethods = ['put', 'delete'];
+        const methodPromises = invalidMethods.map((method) => {
+          return request(app)[method]('/api/articles/3')
+          .expect(405)
+          .then(({body: {msg}})=>{
+            expect(msg).to.equal('method not allowed')
+          })
+        });
+        return Promise.all(methodPromises)
+      });
+    });
+  });
+});
 })
