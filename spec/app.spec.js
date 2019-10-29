@@ -15,10 +15,26 @@ describe('/api', () => {
       .get('/api/topics')
       .expect(200)
       .then(({body}) => {
-        console.log(body.topics)
         expect(body.topics).to.be.an('array')
         expect(body.topics.length).to.equal(3)
+        expect(body.topics[0]).to.contain.keys(
+          'slug', 'description'
+        )
       })
     })
   })
+  describe('/users', () => {
+    it('GET: 200, returns all users', () => {
+      return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.users).to.be.an('array')
+        expect(body.users.length).to.equal(4)
+        expect(body.users[0]).to.contain.keys(
+          'username','avatar_url','name'
+        )
+      })
+    });
+  });
 })
