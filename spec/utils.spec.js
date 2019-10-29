@@ -81,7 +81,7 @@ describe('makeRefObj', () => {
   })
 });
 
-describe.only('formatComments', () => {
+describe('formatComments', () => {
   it('does not mutate the input', () => {
     const input = [];
     expect(formatComments(input)).to.not.equal(input);
@@ -138,10 +138,10 @@ describe.only('formatComments', () => {
     }, {
       body:
     'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
-  article_id: 12,
-  author: 'butter_bridge',
-  votes: 14,
-  created_at: new Date(1479818163389)
+    article_id: 12,
+    author: 'butter_bridge',
+    votes: 14,
+    created_at: new Date(1479818163389)
     }]
     expect(formatComments(input1, input2)).to.eql(expected)
   })
