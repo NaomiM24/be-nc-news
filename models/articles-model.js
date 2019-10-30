@@ -43,7 +43,7 @@ return Promise.reject({
 })
 }
 
-exports.addCommentToArticle = (id, comment) => {
+exports.addCommentByArticleId = (id, comment) => {
   if (comment.hasOwnProperty('username') && comment.hasOwnProperty('body')){
     let newComment = {}
     newComment.article_id = id
@@ -59,5 +59,28 @@ exports.addCommentToArticle = (id, comment) => {
   })
 }
 
+exports.fetchCommentsByArticleId = (id, sort_by = 'created_at', order = 'desc') => {
+  if (order === 'asc' || order === 'desc'){
+  return connection
+  .select('*')
+  .from('comments')
+  .orderBy(sort_by, order)
+  .where('article_id', '=', id)
+  .then(comments => {
+    if (!comments[0])
+    return Promise.reject({
+      status: 404,
+      msg: "article does not exist"
+    })
+    console.log(comments)
+    return comments
+  });
+}
+return Promise.reject({
+  status: 400,
+  msg: "Order method not approved"
+})
+}
 
   
+//sort_by = "created_at", order = "descending"
