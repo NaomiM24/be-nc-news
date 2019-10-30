@@ -81,23 +81,19 @@ return Promise.reject({
 })
 }
 
-// exports.fetchArticles = () => {
-//   return connection
-//   .select('article_id', 'title', 'topic', 'author', 'created_at', 'comment_count')
-//   .from('articles')
-//   .map(article => this.fetchArticleById(article.article_id))
-//   .then(articles => {
-//     console.log([].concat(...articles))
-//   });
-// }
 
-// exports.fetchArticles = () => {
-//   let articleArr = []
-//   return connection
-//   .select('author', 'title', 'article_id', 'topic', 'created_at', '')
-//   .from('articles').then((articles) => {'
-//    .map(article => this.fetchArticleById(article.article_id))
-
-//   })
-//   .then(articles => console.log(...articles))
-// 
+exports.fetchArticles = ({sort_by = 'created_at', order = 'desc'}) => {
+  if (order === 'asc' || order === 'desc'){
+  return connection
+  .select('articles.article_id', 'title', 'topic', 'articles.author', 'articles.created_at')
+  .from('articles')
+  .orderBy(sort_by, order)
+  .count({comment_count: 'comment_id' })
+  .leftJoin('comments', 'articles.article_id', 'comments.article_id')
+  .groupBy('articles.article_id')
+    }
+  return Promise.reject({
+      status: 400,
+      msg: "Order method not approved"
+    }) 
+}

@@ -28,7 +28,7 @@ describe('/api', () => {
     })
     describe('ERRORS', () => {
       it('405 INVALID METHODS', () => {
-        const invalidMethods = ['patch', 'put', 'delete'];
+        const invalidMethods = ['patch', 'put', 'delete', 'post'];
         const methodPromises = invalidMethods.map((method) => {
           return request(app)[method]('/api/topics')
           .expect(405)
@@ -102,12 +102,68 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    it.only('GET: 200, returns an array of article objects', () => {
+    it('GET: 200, returns an array of article objects', () => {
       return request(app)
       .get('/api/articles')
       .expect(200)
       .then(({body}) => {
-        console.log(body)
+        expect(body.articles).to.be.an('array')
+        expect(body.articles[0]).to.contain.keys(
+          'article_id', 'title', 'topic', 'author', 'created_at', 'comment_count'
+        )
+      })
+    })
+    it('GET: 200, articles are sorted by "date" by default in descending order', () => {
+      return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles).to.be.sortedBy('created_at', {descending: true})
+      })
+    })
+    it('GET: 200, articles can be sorted by other columns when passed a valid column as a url sort_by query', () => {
+      return request(app)
+      .get('/api/articles?sort_by=author')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles).to.be.sortedBy('author', {descending: true})
+      })
+    })
+    it('GET: 200, articles  can be ordered in ascending order if passed as a url "order" query', () => {
+      return request(app)
+      .get('/api/articles/?order=asc')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles).to.be.sortedBy('created_at', {ascending: true})
+      })
+    })
+    describe('ERRORS', () => {
+      it('405 INVALID METHODS', () => {
+        const invalidMethods = ['patch', 'put', 'delete', 'post'];
+          const methodPromises = invalidMethods.map((method) => {
+            return request(app)[method]('/api/articles')
+            .expect(405)
+            .then(({body: {msg}})=>{
+              expect(msg).to.equal('method not allowed')
+            })
+          });
+          return Promise.all(methodPromises)
+      })
+    })
+    it('GET: 400, when sort_by passed invalid column name', () => {
+      return request(app)
+      .get('/api/articles?sort_by=invalid')
+      .expect(400)
+      .then(({body}) => {
+        expect(body.msg).to.equal('column "invalid" does not exist')
+      })
+    })
+    it('GET: 400, when order passed something other than asc/desc', () => {
+      return request(app)
+      .get('/api/articles?order=maybe')
+      .expect(400)
+      .then(({body}) => {
+        expect(body.msg).to.equal('Order method not approved')
       })
     })
     describe('/:article_id', () => {
