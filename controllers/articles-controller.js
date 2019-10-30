@@ -1,4 +1,4 @@
-const { fetchArticleById, updateArticleVotes, addCommentByArticleId, fetchCommentsByArticleId } = require('../models/articles-model')
+const { fetchArticleById, updateArticleVotes, addCommentByArticleId, fetchCommentsByArticleId, fetchArticles } = require('../models/articles-model')
 
 exports.getArticleById = (req, res, next) => {
   
@@ -35,3 +35,8 @@ exports.getCommentsByArticleId = (req, res, next) => {
   }).catch(next)
 }
 
+exports.getArticles = (req, res, next) =>{
+  fetchArticles().then((response)=>{
+    console.log('in controller')
+  })
+}

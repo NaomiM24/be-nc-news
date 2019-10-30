@@ -72,7 +72,6 @@ exports.fetchCommentsByArticleId = (id, sort_by = 'created_at', order = 'desc') 
       status: 404,
       msg: "article does not exist"
     })
-    console.log(comments)
     return comments
   });
 }
@@ -82,5 +81,23 @@ return Promise.reject({
 })
 }
 
-  
-//sort_by = "created_at", order = "descending"
+// exports.fetchArticles = () => {
+//   return connection
+//   .select('article_id', 'title', 'topic', 'author', 'created_at', 'comment_count')
+//   .from('articles')
+//   .map(article => this.fetchArticleById(article.article_id))
+//   .then(articles => {
+//     console.log([].concat(...articles))
+//   });
+// }
+
+// exports.fetchArticles = () => {
+//   let articleArr = []
+//   return connection
+//   .select('author', 'title', 'article_id', 'topic', 'created_at', '')
+//   .from('articles').then((articles) => {'
+//    .map(article => this.fetchArticleById(article.article_id))
+
+//   })
+//   .then(articles => console.log(...articles))
+// 

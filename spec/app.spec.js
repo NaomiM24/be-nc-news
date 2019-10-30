@@ -102,10 +102,14 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    // it('GET: 200, returns an array of article objects', () => {
-    //   return request(app)
-    //   .get('/api/articles')
-    // })
+    it.only('GET: 200, returns an array of article objects', () => {
+      return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({body}) => {
+        console.log(body)
+      })
+    })
     describe('/:article_id', () => {
     it('GET 200, returns an article object with author as the username from users table and comment_count which is the total count of all comments with this article_id', () => {
         return request(app)
