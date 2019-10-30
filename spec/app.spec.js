@@ -180,11 +180,20 @@ describe('/api', () => {
       });
       it('PATCH: 400 when inc_votes is invalid', () => {
         return request(app)
-        .patch('/api/articles/boooop')
+        .patch('/api/articles/3')
         .send({inc_votes: 'hi'})
         .expect(400)
         .then(({body}) => {
           expect(body.msg).to.eql('invalid input syntax for integer: "NaN"')
+          })
+      });
+      it('PATCH: 400 when inc_votes includes a different property', () => {
+        return request(app)
+        .patch('/api/articles/2')
+        .send({msg: 'HELLO!!'})
+        .expect(400)
+        .then(({body}) => {
+         expect(body.msg).to.equal("Invalid property on request body")
           })
       })
     });
@@ -193,11 +202,71 @@ describe('/api', () => {
         return request(app)
           .post("/api/articles/3/comments")
           .send({
-            username: 'bobby', 
+            username: 'rogersop', 
             body: 'i disagree with you'
           })
           .expect(201)
-          .then(response => console.log(response))
+          .then(({body}) => {
+            expect(body.comment).to.equal('i disagree with you')
+          })
+      });
+      it('GET: 200, returns an array of comments for a given article_id', () => {
+        return request(app)
+        .get('/api/articles/:article_id/comments')
+        .expect(200)
+        .then(({body}) => {
+          expect(body).to.be.an('array')
+          expect(body.to.contain.keys('comment_id', 'votes', 'created_at'))
+        })
+      })
+      describe('ERRORS /:article_id/comments', () => {
+        it('POST: 404 when article id does not exist', () => {
+          return request(app)
+            .post('/api/articles/1941/comments')
+            .send({
+              username: 'rogersop', 
+              body: 'i disagree with you'
+            })
+            .expect(404)
+            .then(({body}) => {
+              expect(body.msg).to.equal('insert or update on table "comments" violates foreign key constraint "comments_article_id_foreign"')
+            })
+        });
+        it('POST: 400, when article_id is invalid', () => {
+          return request(app)
+          .post('/api/articles/three/comments')
+          .send({
+            username: 'rogersop', 
+            body: 'i disagree with you'
+          })
+          .expect(400)
+          .then(({body}) => {
+            expect(body.msg).to.equal('invalid input syntax for integer: "three"')
+            })
+        });
+        it('POST: 400, when there is a missing property on request body', () => {
+          return request(app)
+          .post('/api/articles/3/comments')
+          .send({
+            body: 'i disagree with you'
+          })
+          .expect(400)
+          .then(({body}) => {
+            expect(body.msg).to.equal('Missing property on request body')
+            })
+        });
+        it('POST: 404, when there is an invalid username', () => {
+          return request(app)
+          .post('/api/articles/3/comments')
+          .send({
+            username: 'notarealuser',
+            body: 'i disagree with you'
+          })
+          .expect(404)
+          .then(({body}) => {
+            expect(body.msg).to.equal('insert or update on table "comments" violates foreign key constraint "comments_author_foreign"')
+            })
+        });
       });
     });
   });

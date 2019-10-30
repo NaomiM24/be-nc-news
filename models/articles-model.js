@@ -23,7 +23,8 @@ exports.fetchArticleById = (article_id) => {
   })
 }
 exports.updateArticleVotes = (id, inc_votes) => {
-  return connection('articles')
+  if (inc_votes){
+    return connection('articles')
   .where('article_id', '=', id)
   .increment('votes', inc_votes)
   .returning('*')
@@ -36,12 +37,27 @@ exports.updateArticleVotes = (id, inc_votes) => {
     return article
   });
 }
+return Promise.reject({
+  status: 400,
+  msg: "Invalid property on request body"
+})
+}
+
+exports.addCommentToArticle = (id, comment) => {
+  if (comment.hasOwnProperty('username') && comment.hasOwnProperty('body')){
+    let newComment = {}
+    newComment.article_id = id
+    newComment.author = comment.username
+    newComment.body = comment.body
+    return connection('comments')
+    .insert(newComment)
+    .returning('*')
+  }
+  return Promise.reject({
+    status: 400,
+    msg: "Missing property on request body"
+  })
+}
 
 
-  //  return connection('comments').select('*').where({article_id}).then((result)=>
-  //  return connection('articles').first('*').where({article_id}).join('co')
-  //  console.log(result.length)
-  // )
-  //return connection('articles').first('*').where({article_id})
-  
   
