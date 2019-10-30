@@ -1,5 +1,9 @@
+exports.customErrors = (err, req, res, next) => {
+  if (err.status) res.status(err.status).send({msg: err.msg})
+  else next(err)
+}
 exports.psqlErrors = (err, req, res, next) => {
-  console.log(err)
+  console.log(err.message)
   const psqlRef= {
     "22P02" : {
       status: 400,
@@ -11,16 +15,11 @@ exports.psqlErrors = (err, req, res, next) => {
   else next(err);
 }
 
-exports.customErrors = (err, req, res, next) => {
-  console.log(err)
-  if (err.status) res.status(err.status).send({msg: err.msg})
-  else next(err)
-}
 
 exports.send405Error = (req, res, next) => {
   res.status(405).send({msg: 'method not allowed'})
 }
 
 function createMessage(err) {
-  return err.message.split(" - ")[1];
+  return err.message.split(" - ").pop();
 }

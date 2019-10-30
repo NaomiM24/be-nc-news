@@ -97,15 +97,13 @@ describe('/api', () => {
       });
     });
   });
-  describe.only('/articles', () => {
+  describe('/articles', () => {
     describe('/:article_id', () => {
-      it('GET 200, returns an article object with author as the username from users table and comment_count which is the total count of all comments with this article_id', () => {
+    it('GET 200, returns an article object with author as the username from users table and comment_count which is the total count of all comments with this article_id', () => {
         return request(app)
         .get('/api/articles/1')
         .expect(200)
         .then(({body}) => {
-          //console.log(body)
-
           expect(body).to.eql({article: { 
             article_id: 1,
             title: 'Living in the shadow of a great man',
@@ -117,7 +115,35 @@ describe('/api', () => {
             comment_count: '13' }});
       });
     });
-    describe('ERRORS', () => {
+    it('PATCH: 200, accepts an object to update votes property and returns updated article', () => {
+      return request(app)
+      .patch('/api/articles/1')
+      .send({inc_votes: 10})
+      .expect(200)
+      .then(({body}) => {
+        expect(body).to.eql({article: { 
+          article_id: 1,
+          title: 'Living in the shadow of a great man',
+          body: 'I find this existence challenging',
+          votes: 110,
+          topic: 'mitch',
+          author: 'butter_bridge',
+          created_at: "2018-11-15T12:21:54.171Z",
+          comment_count: '13' }});
+      })
+    })
+    describe('ERRORS /:article_id', () => {
+      it('405 INVALID METHODS with article_id', () => {
+        const invalidMethods = ['put', 'delete'];
+        const methodPromises = invalidMethods.map((method) => {
+          return request(app)[method]('/api/articles/3')
+          .expect(405)
+          .then(({body: {msg}})=>{
+            expect(msg).to.equal('method not allowed')
+          })
+        });
+        return Promise.all(methodPromises)
+      });
       it('GET: 404 when article id does not exist', () => {
         return request(app)
           .get('/api/articles/194')
@@ -129,21 +155,49 @@ describe('/api', () => {
       it('GET: 400 when article id is invalid', () => {
         return request(app)
         .get('/api/articles/helpmeplease')
-          .expect(400)
-          .then(({body}) => {
-            expect(body.msg).to.eql('invalid input syntax for integer: "helpmeplease"')
+        .expect(400)
+        .then(({body}) => {
+          expect(body.msg).to.eql('invalid input syntax for integer: "helpmeplease"')
           })
       })
-      it('405 INVALID METHODS', () => {
-        const invalidMethods = ['put', 'delete'];
-        const methodPromises = invalidMethods.map((method) => {
-          return request(app)[method]('/api/articles/3')
-          .expect(405)
-          .then(({body: {msg}})=>{
-            expect(msg).to.equal('method not allowed')
+      it('PATCH: 404 when article id does not exist', () => {
+        return request(app)
+          .patch('/api/articles/1941')
+          .send({inc_votes: 10})
+          .expect(404)
+          .then(({body}) => {
+            expect(body.msg).to.eql('article does not exist')
           })
-        });
-        return Promise.all(methodPromises)
+      });
+      it('PATCH: 400 when article id is invalid', () => {
+        return request(app)
+        .patch('/api/articles/boooop')
+        .send({inc_votes: -10})
+        .expect(400)
+        .then(({body}) => {
+          expect(body.msg).to.eql('invalid input syntax for integer: "boooop"')
+          })
+      });
+      it('PATCH: 400 when inc_votes is invalid', () => {
+        return request(app)
+        .patch('/api/articles/boooop')
+        .send({inc_votes: 'hi'})
+        .expect(400)
+        .then(({body}) => {
+          expect(body.msg).to.eql('invalid input syntax for integer: "NaN"')
+          })
+      })
+    });
+    describe.only('/comments', () => {
+      it('POST: 201, accepts an object with a username and body and returns posted comment', () => {
+        return request(app)
+          .post("/api/articles/3/comments")
+          .send({
+            username: 'bobby', 
+            body: 'i disagree with you'
+          })
+          .expect(201)
+          .then(response => console.log(response))
       });
     });
   });
