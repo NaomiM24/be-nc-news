@@ -273,7 +273,7 @@ describe('/api', () => {
           expect(body.msg).to.equal('topic does not exist')
         })
       })
-      it.only('GET: 404, when filter by a topic that does not exist but by a username that does', () => {
+      it('GET: 404, when filter by a topic that does not exist but by a username that does', () => {
         return request(app)
         .get('/api/articles?topic=dogs&username=rogersop')
         .expect(404)
@@ -281,7 +281,7 @@ describe('/api', () => {
           expect(body.msg).to.equal('topic does not exist')
         })
       })
-      it.only('GET: 404, when filter by a topic that does exist but by a username that does not', () => {
+      it('GET: 404, when filter by a topic that does exist but by a username that does not', () => {
         return request(app)
         .get('/api/articles?topic=mitch&username=bobby')
         .expect(404)
@@ -289,7 +289,7 @@ describe('/api', () => {
           expect(body.msg).to.equal('username does not exist')
         })
       })
-      it.only('GET: 404, when filter by both topic and username that do not exist', () => {
+      it('GET: 404, when filter by both topic and username that do not exist', () => {
         return request(app)
         .get('/api/articles?topic=mitch&username=bobby')
         .expect(404)

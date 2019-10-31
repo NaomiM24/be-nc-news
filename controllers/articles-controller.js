@@ -13,7 +13,6 @@ exports.getArticleById = (req, res, next) => {
 exports.patchArticleVotes = (req, res, next) => {
   const {article_id} = req.params;
   const {inc_votes} = req.body
-  //console.log(inc_votes)
   updateArticleVotes(article_id, inc_votes).then(article => {
     fetchArticleById(article[0].article_id).then(article => {
       res.status(200).send({article: article[0]})
