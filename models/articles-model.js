@@ -92,18 +92,20 @@ exports.fetchArticles = ({sort_by = 'created_at', order = 'desc', username, topi
   .count({comment_count: 'comment_id' })
   .leftJoin('comments', 'articles.article_id', 'comments.article_id')
   .groupBy('articles.article_id')
-  .then(articles => {
-    if (!articles[0]){
-      return Promise.reject({
-        status: 404,
-        msg: 'No articles found'
-      })
-    }
-    return articles
-  })
-  }
-  return Promise.reject({
-      status: 404,
-      msg: "Order method not approved"
-    }) 
-  }
+  // .then(articles => {
+  //   // return articles
+  // })
+}
+return Promise.reject({
+  status: 404,
+  msg: "Order method not approved"
+}) 
+}
+
+//console.log(articles.length)
+// if (!articles[0]){
+//   return Promise.reject({
+//     status: 404,
+//     msg: 'Invalid filter'
+//   })
+// }

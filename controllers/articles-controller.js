@@ -1,4 +1,6 @@
 const { fetchArticleById, updateArticleVotes, addCommentByArticleId, fetchCommentsByArticleId, fetchArticles } = require('../models/articles-model')
+const { fetchTopics } = require('../models/topics-models')
+const { fetchUserByUsername } = require('../models/users-models')
 
 exports.getArticleById = (req, res, next) => {
   
@@ -36,8 +38,15 @@ exports.getCommentsByArticleId = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) =>{
+  
   fetchArticles(req.query).then((articles)=>{
-    //console.log(articles)
-    res.status(200).send({articles})
-  }).catch(next)
+    console.log(articles.length)
+    if (!articles.length){
+      return Promise.all([articles, fetchUserByUsername(req.query.username), fetchTopics])
+    } else {
+      return [articles]
+    }}).then(([articles]) => {
+      console.log(articles)
+      res.status(200).send({articles})
+    }).catch(next)
 }

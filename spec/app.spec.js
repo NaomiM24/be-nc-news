@@ -101,7 +101,7 @@ describe('/api', () => {
       });
     });
   });
-  describe('/articles', () => {
+  describe.only('/articles', () => {
     it('GET: 200, returns an array of article objects', () => {
       return request(app)
       .get('/api/articles')
@@ -197,6 +197,22 @@ describe('/api', () => {
           comment_count: '0' } ])
       })
     })
+    it('GET: 200, when filter by a username that exists but has no articles associated with it, returns []', () => {
+      return request(app)
+      .get('/api/articles?username=lurker')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles).to.eql([])
+      })
+    })
+    it('GET: 200, when filter by a valid topic that has no articles', () => {
+      return request(app)
+      .get('/api/articles?topic=paper')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles).to.eql([])
+      })
+    })
     describe('ERRORS', () => {
       it('405 INVALID METHODS', () => {
         const invalidMethods = ['patch', 'put', 'delete', 'post'];
@@ -225,12 +241,12 @@ describe('/api', () => {
           expect(body.msg).to.equal('Order method not approved')
         })
       })
-      it('GET: 404, when filter by a usename that does not exist', () => {
+      it('GET: 404, when filter by a username that does not exist', () => {
         return request(app)
         .get('/api/articles?username=maybe')
         .expect(404)
         .then(({body}) => {
-          expect(body.msg).to.equal('No articles found')
+          expect(body.msg).to.equal('username does not exist')
         })
       })
       it('GET: 404, when filter by a topic that does not exist', () => {
@@ -238,23 +254,7 @@ describe('/api', () => {
         .get('/api/articles?topic=dogs')
         .expect(404)
         .then(({body}) => {
-          expect(body.msg).to.equal('No articles found')
-        })
-      })
-      it('GET: 404, when filter by a usename that exists but has no articles associated with it', () => {
-        return request(app)
-        .get('/api/articles?username=lurker')
-        .expect(404)
-        .then(({body}) => {
-          expect(body.msg).to.equal('No articles found')
-        })
-      })
-      it('GET: 404, when filter by a valid usename that exists and an invalid topic', () => {
-        return request(app)
-        .get('/api/articles?username=icellusedkars?topic=dogs')
-        .expect(404)
-        .then(({body}) => {
-          expect(body.msg).to.equal('No articles found')
+          expect(body.msg).to.equal('topic does not exist')
         })
       })
     })
@@ -500,7 +500,7 @@ describe('/api', () => {
     });
     });
   });
-  describe.only('/comments/:comment_id', () => {
+  describe('/comments/:comment_id', () => {
     it('PATCH 200, an object updates the votes on a comment and response with the updated comment', () => {
       return request(app)
       .patch('/api/comments/1')
