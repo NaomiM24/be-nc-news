@@ -248,7 +248,15 @@ describe('/api', () => {
         .then(({body}) => {
           expect(body.msg).to.equal('No articles found')
         })
-    })
+      })
+      it('GET: 404, when filter by a valid usename that exists and an invalid topic', () => {
+        return request(app)
+        .get('/api/articles?username=icellusedkars?topic=dogs')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('No articles found')
+        })
+      })
     })
     describe('/:article_id', () => {
     it('GET 200, returns an article object with author as the username from users table and comment_count which is the total count of all comments with this article_id', () => {
@@ -490,6 +498,92 @@ describe('/api', () => {
         })
       });
     });
+    });
   });
-});
+  describe.only('/comments/:comment_id', () => {
+    it('PATCH 200, an object updates the votes on a comment and response with the updated comment', () => {
+      return request(app)
+      .patch('/api/comments/1')
+      .send({inc_votes: 20})
+      .expect(200)
+      .then(({body}) => { 
+        expect(body.comment).to.eql([ { comment_id: 1,
+          author: 'butter_bridge',
+          article_id: 9,
+          votes: 36,
+          created_at: '2017-11-22T12:36:03.389Z',
+          body: 'Oh, I\'ve got compassion running out of my nose, pal! I\'m the Sultan of Sentiment!' } ])
+      })
+    })
+    it('DELETE 204, deletes a comment by comment_id and respond with no content', () => {
+      return request(app)
+      .delete('/api/comments/2')
+      .expect(204)
+    })
+    describe('ERRORS', () => {
+      it('405 INVALID METHODS with article_id', () => {
+        const invalidMethods = ['put', 'get', 'post'];
+        const methodPromises = invalidMethods.map((method) => {
+          return request(app)[method]('/api/comments/3')
+          .expect(405)
+          .then(({body: {msg}})=>{
+            expect(msg).to.equal('method not allowed')
+          })
+        });
+        return Promise.all(methodPromises)
+      });
+      it('PATCH 404, when passed a comment id that does not exist', () => {
+        return request(app)
+        .patch('/api/comments/3463')
+        .send({inc_votes: 55})
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('comment does not exist')
+        })
+      });
+      it('PATCH 400, when passed an invalid comment id', () => {
+        return request(app)
+        .patch('/api/comments/twenty')
+        .send({inc_votes: 55})
+        .expect(400)
+        .then(({body}) => {
+          expect(body.msg).to.equal('invalid input syntax for integer: "twenty"')
+        })
+      });
+      it('PATCH: 400 when inc_votes is invalid', () => {
+        return request(app)
+        .patch('/api/comments/3')
+        .send({inc_votes: 'nomorevotes4u'})
+        .expect(400)
+        .then(({body}) => {
+          expect(body.msg).to.eql('invalid input syntax for integer: "NaN"')
+          })
+      });
+      it('PATCH: 400 when inc_votes includes a different property', () => {
+        return request(app)
+        .patch('/api/comments/2')
+        .send({body: 5})
+        .expect(400)
+        .then(({body}) => {
+         expect(body.msg).to.equal("Invalid property on request body")
+          })
+      })
+      it('DELETE: 400 when there is an invalid comment_id', () => {
+        return request(app)
+      .delete('/api/comments/hiya')
+      .expect(400)
+      .then(({body}) =>{
+        expect(body.msg).to.equal('invalid input syntax for integer: "hiya"')
+      })
+      })
+      it('DELETE: 404 when the comment_id does not exist', () => {
+        return request(app)
+      .delete('/api/comments/2527')
+      .expect(404)
+      .then(({body}) =>{
+        expect(body.msg).to.equal('comment does not exist')
+      })
+      })
+    });
+  });
 })
