@@ -14,7 +14,7 @@ exports.psqlErrors = (err, req, res, next) => {
       msg: createMessage(err)
     },
     "42703" : {
-      status: 400,
+      status: 404,
       msg: createMessage(err)
     }
   }

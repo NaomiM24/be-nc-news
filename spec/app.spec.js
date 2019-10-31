@@ -131,10 +131,50 @@ describe('/api', () => {
     })
     it('GET: 200, articles  can be ordered in ascending order if passed as a url "order" query', () => {
       return request(app)
-      .get('/api/articles/?order=asc')
+      .get('/api/articles?order=asc')
       .expect(200)
       .then(({body}) => {
         expect(body.articles).to.be.sortedBy('created_at', {ascending: true})
+      })
+    })
+    it('GET: 200, accepts a query that filters the articles by a username', () => {
+      return request(app)
+      .get('/api/articles?username=butter_bridge')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles.length).to.equal(3)
+        expect(body.articles).to.eql([ { article_id: 1,
+          title: 'Living in the shadow of a great man',
+          topic: 'mitch',
+          author: 'butter_bridge',
+          created_at: '2018-11-15T12:21:54.171Z',
+          comment_count: '13' },
+        { article_id: 9,
+          title: 'They\'re not exactly dogs, are they?',
+          topic: 'mitch',
+          author: 'butter_bridge',
+          created_at: '1986-11-23T12:21:54.171Z',
+          comment_count: '2' },
+        { article_id: 12,
+          title: 'Moustache',
+          topic: 'mitch',
+          author: 'butter_bridge',
+          created_at: '1974-11-26T12:21:54.171Z',
+          comment_count: '0' } ])
+      })
+    })
+    it('GET: 200, accepts a query that filters the articles by a topic', () => {
+      return request(app)
+      .get('/api/articles?topic=cats')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles.length).to.equal(1)
+        expect(body.articles).to.eql([ { article_id: 5,
+          title: 'UNCOVERED: catspiracy to bring down democracy',
+          topic: 'cats',
+          author: 'rogersop',
+          created_at: "2002-11-19T12:21:54.171Z",
+          comment_count: '2' } ])
       })
     })
     describe('ERRORS', () => {
@@ -149,22 +189,23 @@ describe('/api', () => {
           });
           return Promise.all(methodPromises)
       })
-    })
-    it('GET: 400, when sort_by passed invalid column name', () => {
-      return request(app)
-      .get('/api/articles?sort_by=invalid')
-      .expect(400)
-      .then(({body}) => {
-        expect(body.msg).to.equal('column "invalid" does not exist')
+      it('GET: 404, when sort_by passed invalid column name', () => {
+        return request(app)
+        .get('/api/articles?sort_by=invalid')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('column "invalid" does not exist')
+        })
       })
-    })
-    it('GET: 400, when order passed something other than asc/desc', () => {
-      return request(app)
-      .get('/api/articles?order=maybe')
-      .expect(400)
-      .then(({body}) => {
-        expect(body.msg).to.equal('Order method not approved')
+      it('GET: 404, when order passed something other than asc/desc', () => {
+        return request(app)
+        .get('/api/articles?order=maybe')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('Order method not approved')
+        })
       })
+      it('GET: ')
     })
     describe('/:article_id', () => {
     it('GET 200, returns an article object with author as the username from users table and comment_count which is the total count of all comments with this article_id', () => {
@@ -388,18 +429,18 @@ describe('/api', () => {
               expect(body.msg).to.equal('article does not exist')
             })
         });
-        it('GET: 400, when sort_by passed invalid column name', () => {
+        it('GET: 404, when sort_by passed invalid column name', () => {
           return request(app)
           .get('/api/articles/1/comments?sort_by=invalid')
-          .expect(400)
+          .expect(404)
           .then(({body}) => {
             expect(body.msg).to.equal('column "invalid" does not exist')
           })
         })
-        it('GET: 400, when order passed something other than asc/desc', () => {
+        it('GET: 404, when order passed something other than asc/desc', () => {
           return request(app)
           .get('/api/articles/1/comments?order=cry')
-          .expect(400)
+          .expect(404)
           .then(({body}) => {
             expect(body.msg).to.equal('Order method not approved')
           })
