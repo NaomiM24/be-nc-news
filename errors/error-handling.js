@@ -3,7 +3,6 @@ exports.customErrors = (err, req, res, next) => {
   else next(err)
 }
 exports.psqlErrors = (err, req, res, next) => {
-  console.log(err.code)
   const psqlRef= {
     "22P02" : {
       status: 400,
@@ -26,6 +25,10 @@ exports.psqlErrors = (err, req, res, next) => {
 
 exports.send405Error = (req, res, next) => {
   res.status(405).send({msg: 'method not allowed'})
+}
+
+exports.serverErrors = (err, req, res, next) => {
+  res.status(500).send("Server Error!")
 }
 
 function createMessage(err) {
