@@ -13,6 +13,17 @@ describe('/api', () => {
   beforeEach(() => {
     return connection.seed.run();
   })
+  describe.only('/', () => {
+    it('GET: 200, response with a JSON describing all the available endpoints', () => {
+      return request(app)
+      .get('/api')
+      .expect(200)
+      .then(({body}) =>{
+        console.log(body)
+        expect(body.endpoints).to.be.a('object')
+      })
+    });
+  });
   describe('/topics', () => { 
     it('GET: 200, returns all topics', () => {
       return request(app)
