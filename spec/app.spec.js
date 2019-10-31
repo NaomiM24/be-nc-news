@@ -26,6 +26,14 @@ describe('/api', () => {
         )
       })
     })
+    it('GET: 200, returns a specific topic when passed a paramertic endpoint', () => {
+      return request(app)
+      .get('/api/topics/mitch')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.topic).to.eql({ slug: 'mitch', description: 'The man, the Mitch, the legend' })
+      });
+    })
     describe('ERRORS', () => {
       it('405 INVALID METHODS', () => {
         const invalidMethods = ['patch', 'put', 'delete', 'post'];
@@ -38,6 +46,14 @@ describe('/api', () => {
         });
         return Promise.all(methodPromises)
       });
+      it('GET: 404, when passed a topic that does not exist', () => {
+        return request(app)
+        .get('/api/topics/kitch')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('topic does not exist')
+        });
+      })
     });
   })
   describe('/users', () => {
@@ -101,7 +117,7 @@ describe('/api', () => {
       });
     });
   });
-  describe.only('/articles', () => {
+  describe('/articles', () => {
     it('GET: 200, returns an array of article objects', () => {
       return request(app)
       .get('/api/articles')
