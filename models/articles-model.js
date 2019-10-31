@@ -55,7 +55,8 @@ exports.addCommentByArticleId = (id, comment) => {
 }
 
 exports.fetchCommentsByArticleId = (id, sort_by = 'created_at', order = 'desc') => {
-  if (order === 'asc' || order === 'desc'){
+  let orderOptions = ['asc', 'desc']
+  if (orderOptions.includes(order)){
   return connection
   .select('*')
   .from('comments')
@@ -78,7 +79,8 @@ return Promise.reject({
 
 
 exports.fetchArticles = ({sort_by = 'created_at', order = 'desc', username, topic}) => {
-  if (order === 'asc' || order === 'desc'){
+  let orderOptions = ['asc', 'desc']
+  if (orderOptions.includes(order)){
   return connection
   .select('articles.article_id', 'title', 'topic', 'articles.author', 'articles.created_at')
   .from('articles')
@@ -86,14 +88,22 @@ exports.fetchArticles = ({sort_by = 'created_at', order = 'desc', username, topi
   .modify((query) => {
     if (username) query.where('articles.author', '=', username)
     if (topic) query.where({topic})
-
   })
   .count({comment_count: 'comment_id' })
   .leftJoin('comments', 'articles.article_id', 'comments.article_id')
   .groupBy('articles.article_id')
+  .then(articles => {
+    if (!articles[0]){
+      return Promise.reject({
+        status: 404,
+        msg: 'No articles found'
+      })
     }
+    return articles
+  })
+  }
   return Promise.reject({
       status: 404,
       msg: "Order method not approved"
     }) 
-}
+  }

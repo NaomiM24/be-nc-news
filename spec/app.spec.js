@@ -177,6 +177,26 @@ describe('/api', () => {
           comment_count: '2' } ])
       })
     })
+    it('GET: 200, articles can be filtered by topic and username at the same time', () => {
+      return request(app)
+      .get('/api/articles?topic=mitch&username=rogersop')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles.length).to.equal(2)
+        expect(body.articles).to.eql([ { article_id: 4,
+          title: 'Student SUES Mitch!',
+          topic: 'mitch',
+          author: 'rogersop',
+          created_at: '2006-11-18T12:21:54.171Z',
+          comment_count: '0' },
+        { article_id: 10,
+          title: 'Seven inspirational thought leaders from Manchester UK',
+          topic: 'mitch',
+          author: 'rogersop',
+          created_at: '1982-11-24T12:21:54.171Z',
+          comment_count: '0' } ])
+      })
+    })
     describe('ERRORS', () => {
       it('405 INVALID METHODS', () => {
         const invalidMethods = ['patch', 'put', 'delete', 'post'];
@@ -205,7 +225,30 @@ describe('/api', () => {
           expect(body.msg).to.equal('Order method not approved')
         })
       })
-      it('GET: ')
+      it('GET: 404, when filter by a usename that does not exist', () => {
+        return request(app)
+        .get('/api/articles?username=maybe')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('No articles found')
+        })
+      })
+      it('GET: 404, when filter by a topic that does not exist', () => {
+        return request(app)
+        .get('/api/articles?topic=dogs')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('No articles found')
+        })
+      })
+      it('GET: 404, when filter by a usename that exists but has no articles associated with it', () => {
+        return request(app)
+        .get('/api/articles?username=lurker')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('No articles found')
+        })
+    })
     })
     describe('/:article_id', () => {
     it('GET 200, returns an article object with author as the username from users table and comment_count which is the total count of all comments with this article_id', () => {
