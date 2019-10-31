@@ -273,6 +273,30 @@ describe('/api', () => {
           expect(body.msg).to.equal('topic does not exist')
         })
       })
+      it.only('GET: 404, when filter by a topic that does not exist but by a username that does', () => {
+        return request(app)
+        .get('/api/articles?topic=dogs&username=rogersop')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('topic does not exist')
+        })
+      })
+      it.only('GET: 404, when filter by a topic that does exist but by a username that does not', () => {
+        return request(app)
+        .get('/api/articles?topic=mitch&username=bobby')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('username does not exist')
+        })
+      })
+      it.only('GET: 404, when filter by both topic and username that do not exist', () => {
+        return request(app)
+        .get('/api/articles?topic=mitch&username=bobby')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).to.equal('username does not exist')
+        })
+      })
     })
     describe('/:article_id', () => {
     it('GET 200, returns an article object with author as the username from users table and comment_count which is the total count of all comments with this article_id', () => {

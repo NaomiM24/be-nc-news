@@ -40,7 +40,6 @@ exports.getCommentsByArticleId = (req, res, next) => {
 exports.getArticles = (req, res, next) =>{
   
   fetchArticles(req.query).then((articles)=>{
-    console.log(articles.length)
     if (!articles.length){
       if (req.query.username && req.query.topic){
         return Promise.all([articles, fetchUserByUsername(req.query.username), fetchTopicByTopicName(req.query.topic)])
@@ -52,7 +51,6 @@ exports.getArticles = (req, res, next) =>{
     } else {
       return [articles]
     }}).then(([articles]) => {
-      console.log(articles)
       res.status(200).send({articles})
     }).catch(next)
 }
