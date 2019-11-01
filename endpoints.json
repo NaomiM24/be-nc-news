@@ -10,7 +10,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
+    "description": "serves an array of all articles",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
@@ -24,8 +24,8 @@
       ]
     }
   },
-  "GET /api/users/:users": {
-    "description": "serves a user object with the following properties: username, avatar_url, name",
+  "GET /api/users/:username": {
+    "description": "serves a user object with a given username",
     "exampleResponse": {
        "user": 
         { "username": "icellusedkars",
@@ -34,7 +34,7 @@
     }
   },
   "GET /api/articles/:article_id": {
-    "description": "serves an article object",
+    "description": "serves an article object with a given article id",
     "exampleResponse": {"article": { 
       "article_id": 1,
       "title": "Living in the shadow of a great man",

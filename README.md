@@ -91,3 +91,15 @@ To set up the seed files
 ## Step 6 - Deployment
 The app is available at the following URL:
 https://naomi-be-news.herokuapp.com/api
+
+## Available Endpoints
+* GET/api: serves up a json representation of all the available endpoints of the api
+* GET /api/topics - serves an array of all topics
+* GET /api/articles - serves an array of all articles
+* GET /api/users/:users - serves a user object with a given username
+* GET /api/articles/:article_id - erves an article object with a given article id
+* PATCH /api/articles/:article_id - updates an article votes and responds with the updated article object
+* POST /api/articles/:article_id/comments - posts a new comment to an article and responds with the posted comment
+* GET /api/articles/:article_id/comments - responds with an array of comments for the given article_id
+* PATCH /api/comments/:comment_id - updates a comment votes and responds with the updated comment object
+* DELETE /api/comments/:comment_id - deletes a comment, responds with status 204 and no content
