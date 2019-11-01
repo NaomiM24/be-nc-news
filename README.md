@@ -84,7 +84,7 @@ npm run test-app
 
 ```
 Or you can run all tests - including util with:
-To set up the seed files
+
 ```bash
   npm run test
 ```
