@@ -1,7 +1,6 @@
-const connection = require("../connection")
+const connection = require("../db/connection")
 
-exports.updateCommentVotes = (id, inc_votes) => {
-  if (inc_votes){
+exports.updateCommentVotes = (id, inc_votes = 0 ) => {
     return connection('comments')
     .where('comment_id', '=', id)
     .increment('votes', inc_votes)
@@ -13,14 +12,9 @@ exports.updateCommentVotes = (id, inc_votes) => {
           msg: "comment does not exist"
         })
       }
-      return comment
+      return comment[0]
     })
   }
-  return Promise.reject({
-    status: 400,
-    msg: "Invalid property on request body"
-  })
-}
 
 exports.removeCommentById = (id) => {
   return connection('comments')

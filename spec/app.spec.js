@@ -6,7 +6,7 @@ const chaiSorted = require('chai-sorted');
 const { expect } = chai;
 
 chai.use(chaiSorted);
-const connection = require("../connection")
+const connection = require("../db/connection")
 
 describe('/api', () => {
   after(() => connection.destroy())
@@ -19,10 +19,22 @@ describe('/api', () => {
       .get('/api')
       .expect(200)
       .then(({body}) =>{
-        console.log(body)
         expect(body.endpoints).to.be.a('object')
       })
     });
+    describe('ERRORS', () =>{
+      it('405 INVALID METHODS', () => {
+        const invalidMethods = ['patch', 'put', 'delete', 'post'];
+          const methodPromises = invalidMethods.map((method) => {
+            return request(app)[method]('/api')
+            .expect(405)
+            .then(({body: {msg}})=>{
+              expect(msg).to.equal('method not allowed')
+            })
+          });
+          return Promise.all(methodPromises)
+      })
+    })
   });
   describe('/topics', () => { 
     it('GET: 200, returns all topics', () => {
@@ -164,9 +176,9 @@ describe('/api', () => {
         expect(body.articles).to.be.sortedBy('created_at', {ascending: true})
       })
     })
-    it('GET: 200, accepts a query that filters the articles by a username', () => {
+    it('GET: 200, accepts a query that filters the articles by an author username', () => {
       return request(app)
-      .get('/api/articles?username=butter_bridge')
+      .get('/api/articles?author=butter_bridge')
       .expect(200)
       .then(({body}) => {
         expect(body.articles.length).to.equal(3)
@@ -206,7 +218,7 @@ describe('/api', () => {
     })
     it('GET: 200, articles can be filtered by topic and username at the same time', () => {
       return request(app)
-      .get('/api/articles?topic=mitch&username=rogersop')
+      .get('/api/articles?topic=mitch&author=rogersop')
       .expect(200)
       .then(({body}) => {
         expect(body.articles.length).to.equal(2)
@@ -226,7 +238,7 @@ describe('/api', () => {
     })
     it('GET: 200, when filter by a username that exists but has no articles associated with it, returns []', () => {
       return request(app)
-      .get('/api/articles?username=lurker')
+      .get('/api/articles?author=lurker')
       .expect(200)
       .then(({body}) => {
         expect(body.articles).to.eql([])
@@ -252,25 +264,25 @@ describe('/api', () => {
           });
           return Promise.all(methodPromises)
       })
-      it('GET: 404, when sort_by passed invalid column name', () => {
+      it('GET: 400, when sort_by passed invalid column name', () => {
         return request(app)
         .get('/api/articles?sort_by=invalid')
-        .expect(404)
+        .expect(400)
         .then(({body}) => {
           expect(body.msg).to.equal('column "invalid" does not exist')
         })
       })
-      it('GET: 404, when order passed something other than asc/desc', () => {
+      it('GET: 400, when order passed something other than asc/desc', () => {
         return request(app)
         .get('/api/articles?order=maybe')
-        .expect(404)
+        .expect(400)
         .then(({body}) => {
           expect(body.msg).to.equal('Order method not approved')
         })
       })
       it('GET: 404, when filter by a username that does not exist', () => {
         return request(app)
-        .get('/api/articles?username=maybe')
+        .get('/api/articles?author=maybe')
         .expect(404)
         .then(({body}) => {
           expect(body.msg).to.equal('username does not exist')
@@ -286,7 +298,7 @@ describe('/api', () => {
       })
       it('GET: 404, when filter by a topic that does not exist but by a username that does', () => {
         return request(app)
-        .get('/api/articles?topic=dogs&username=rogersop')
+        .get('/api/articles?topic=dogs&author=rogersop')
         .expect(404)
         .then(({body}) => {
           expect(body.msg).to.equal('topic does not exist')
@@ -294,7 +306,7 @@ describe('/api', () => {
       })
       it('GET: 404, when filter by a topic that does exist but by a username that does not', () => {
         return request(app)
-        .get('/api/articles?topic=mitch&username=bobby')
+        .get('/api/articles?topic=mitch&author=bobby')
         .expect(404)
         .then(({body}) => {
           expect(body.msg).to.equal('username does not exist')
@@ -302,7 +314,7 @@ describe('/api', () => {
       })
       it('GET: 404, when filter by both topic and username that do not exist', () => {
         return request(app)
-        .get('/api/articles?topic=mitch&username=bobby')
+        .get('/api/articles?topic=mitch&author=bobby')
         .expect(404)
         .then(({body}) => {
           expect(body.msg).to.equal('username does not exist')
@@ -343,6 +355,23 @@ describe('/api', () => {
           comment_count: '13' }});
       })
     })
+    it('PATCH: 200 when inc_votes has no inc_votes property there is a default value of 0', () => {
+        return request(app)
+        .patch('/api/articles/1')
+        .send({msg: 'HELLO!!'})
+        .expect(200)
+        .then(({body}) => {
+         expect(body).to.eql({article: { 
+          article_id: 1,
+          title: 'Living in the shadow of a great man',
+          body: 'I find this existence challenging',
+          votes: 100,
+          topic: 'mitch',
+          author: 'butter_bridge',
+          created_at: "2018-11-15T12:21:54.171Z",
+          comment_count: '13' }})
+          })
+      })
     describe('ERRORS /:article_id', () => {
       it('405 INVALID METHODS with article_id', () => {
         const invalidMethods = ['put', 'delete'];
@@ -398,15 +427,7 @@ describe('/api', () => {
           expect(body.msg).to.eql('invalid input syntax for integer: "NaN"')
           })
       });
-      it('PATCH: 400 when inc_votes includes a different property', () => {
-        return request(app)
-        .patch('/api/articles/2')
-        .send({msg: 'HELLO!!'})
-        .expect(400)
-        .then(({body}) => {
-         expect(body.msg).to.equal("Invalid property on request body")
-          })
-      })
+      
     });
     describe('/comments', () => {
       it('POST: 201, accepts an object with a username and body and returns posted comment', () => {
@@ -418,8 +439,8 @@ describe('/api', () => {
           })
           .expect(201)
           .then(({body}) => {
-            expect(body.comment).to.equal('i disagree with you')
-          })
+            expect(body.comment).to.contain.keys('comment_id', 'votes', 'created_at', 'author', 'body')
+          });
       });
       it('GET: 200, returns an array of comments for a given article_id', () => {
         return request(app)
@@ -430,6 +451,14 @@ describe('/api', () => {
           if (body.comments[0]){ 
             expect(body.comments[0]).to.contain.keys('comment_id', 'votes', 'created_at', 'author', 'body')
           }
+        })
+      })
+      it('GET: 200, returns an empty array when an article id has no comments', () => {
+        return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then(({body}) => {
+          expect(body.comments).to.eql([])
         })
       })
       it('GET: 200, comments are sorted by default by "created_at" in descending order', () => {
@@ -531,18 +560,18 @@ describe('/api', () => {
               expect(body.msg).to.equal('article does not exist')
             })
         });
-        it('GET: 404, when sort_by passed invalid column name', () => {
+        it('GET: 400, when sort_by passed invalid column name', () => {
           return request(app)
           .get('/api/articles/1/comments?sort_by=invalid')
-          .expect(404)
+          .expect(400)
           .then(({body}) => {
             expect(body.msg).to.equal('column "invalid" does not exist')
           })
         })
-        it('GET: 404, when order passed something other than asc/desc', () => {
+        it('GET: 400, when order passed something other than asc/desc', () => {
           return request(app)
           .get('/api/articles/1/comments?order=cry')
-          .expect(404)
+          .expect(400)
           .then(({body}) => {
             expect(body.msg).to.equal('Order method not approved')
           })
@@ -558,14 +587,29 @@ describe('/api', () => {
       .send({inc_votes: 20})
       .expect(200)
       .then(({body}) => { 
-        expect(body.comment).to.eql([ { comment_id: 1,
+        expect(body.comment).to.eql({ comment_id: 1,
           author: 'butter_bridge',
           article_id: 9,
           votes: 36,
           created_at: '2017-11-22T12:36:03.389Z',
-          body: 'Oh, I\'ve got compassion running out of my nose, pal! I\'m the Sultan of Sentiment!' } ])
+          body: 'Oh, I\'ve got compassion running out of my nose, pal! I\'m the Sultan of Sentiment!' } )
       })
     })
+    it('PATCH: 200 when the request body does not have a inc_votes property it defaults to 0', () => {
+        return request(app)
+        .patch('/api/comments/2')
+        .send({body: 5})
+        .expect(200)
+        .then(({body}) => {
+         expect(body.comment).to.eql({ comment_id: 2,
+          author: 'butter_bridge',
+          article_id: 1,
+          votes: 14,
+          created_at: '2016-11-22T12:36:03.389Z',
+          body: 'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.' 
+          })
+        })
+      })
     it('DELETE 204, deletes a comment by comment_id and respond with no content', () => {
       return request(app)
       .delete('/api/comments/2')
@@ -610,30 +654,21 @@ describe('/api', () => {
           expect(body.msg).to.eql('invalid input syntax for integer: "NaN"')
           })
       });
-      it('PATCH: 400 when inc_votes includes a different property', () => {
-        return request(app)
-        .patch('/api/comments/2')
-        .send({body: 5})
-        .expect(400)
-        .then(({body}) => {
-         expect(body.msg).to.equal("Invalid property on request body")
-          })
-      })
       it('DELETE: 400 when there is an invalid comment_id', () => {
         return request(app)
-      .delete('/api/comments/hiya')
-      .expect(400)
-      .then(({body}) =>{
-        expect(body.msg).to.equal('invalid input syntax for integer: "hiya"')
-      })
+        .delete('/api/comments/hiya')
+        .expect(400)
+        .then(({body}) =>{
+          expect(body.msg).to.equal('invalid input syntax for integer: "hiya"')
+         })
       })
       it('DELETE: 404 when the comment_id does not exist', () => {
         return request(app)
-      .delete('/api/comments/2527')
-      .expect(404)
-      .then(({body}) =>{
+        .delete('/api/comments/2527')
+        .expect(404)
+        .then(({body}) =>{
         expect(body.msg).to.equal('comment does not exist')
-      })
+       })
       })
     });
   });

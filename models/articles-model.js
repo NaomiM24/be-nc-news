@@ -1,4 +1,4 @@
-const connection = require("../connection")
+const connection = require("../db/connection")
 
 exports.fetchArticleById = (article_id) => {
   return connection
@@ -17,8 +17,8 @@ exports.fetchArticleById = (article_id) => {
     return article
   })
 }
-exports.updateArticleVotes = (id, inc_votes) => {
-  if (inc_votes){
+exports.updateArticleVotes = (id, inc_votes = 0) => {
+ 
     return connection('articles')
   .where('article_id', '=', id)
   .increment('votes', inc_votes)
@@ -31,11 +31,6 @@ exports.updateArticleVotes = (id, inc_votes) => {
     })
     return article
   });
-}
-return Promise.reject({
-  status: 400,
-  msg: "Invalid property on request body"
-})
 }
 
 exports.addCommentByArticleId = (id, comment) => {
@@ -62,23 +57,15 @@ exports.fetchCommentsByArticleId = (id, sort_by = 'created_at', order = 'desc') 
   .from('comments')
   .orderBy(sort_by, order)
   .where('article_id', '=', id)
-  .then(comments => {
-    if (!comments[0])
-    return Promise.reject({
-      status: 404,
-      msg: "article does not exist"
-    })
-    return comments
-  });
 }
 return Promise.reject({
-  status: 404,
+  status: 400,
   msg: "Order method not approved"
 })
 }
 
 
-exports.fetchArticles = ({sort_by = 'created_at', order = 'desc', username, topic}) => {
+exports.fetchArticles = ({sort_by = 'created_at', order = 'desc', author, topic}) => {
   let orderOptions = ['asc', 'desc']
   if (orderOptions.includes(order)){
   return connection
@@ -86,7 +73,7 @@ exports.fetchArticles = ({sort_by = 'created_at', order = 'desc', username, topi
   .from('articles')
   .orderBy(sort_by, order)
   .modify((query) => {
-    if (username) query.where('articles.author', '=', username)
+    if (author) query.where('articles.author', '=', author)
     if (topic) query.where({topic})
   })
   .count({comment_count: 'comment_id' })
@@ -95,7 +82,7 @@ exports.fetchArticles = ({sort_by = 'created_at', order = 'desc', username, topi
  
 }
 return Promise.reject({
-  status: 404,
+  status: 400,
   msg: "Order method not approved"
 }) 
 }
