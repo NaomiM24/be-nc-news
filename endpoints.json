@@ -19,7 +19,7 @@
           "topic": "cooking",
           "author": "weegembump",
           "body": "Text from the article..",
-          "created_at": 1527695953341
+          "created_at": "2018-11-15T12:21:54.171Z"
          }
       ]
     }
@@ -34,7 +34,7 @@
     }
   },
   "GET /api/articles/:article_id": {
-    "description": "serves an article object with the following properties: article_id, title, body, votes, topic, author, created_at and comment_count",
+    "description": "serves an article object",
     "exampleResponse": {"article": { 
       "article_id": 1,
       "title": "Living in the shadow of a great man",
@@ -46,7 +46,7 @@
       "comment_count": 13 }}
   },
   "PATCH /api/articles/:article_id": {
-    "description": "updates an article votes and reponds with the updated article object",
+    "description": "updates an article votes and responds with the updated article object",
     "exampleResponse": {"article": { 
       "article_id": 1,
       "title": "Living in the shadow of a great man",
@@ -68,13 +68,19 @@
       "body": "i disagree with you" }}
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "responds with an arrray of comments for the given article_id and accepts sort_by and order queries"
-  },
-  "GET /api/articles/": {
-    "description": "responds with an arrray of articles and accepts sort_by and order queries as well as author and topic filters"
+    "description": "responds with an array of comments for the given article_id",
+    "queries": ["sort_by", "order"],
+    "exampleResponse": { "comments":[
+      {   "comment_id": 5,
+          "author": "icellusedkars",
+          "article_id": 1,
+          "votes": 0,
+          "created_at": "2013-11-23T12:36:03.389Z",
+          "body": "I hate streaming noses" }
+    ]}
   },
   "PATCH /api/comments/:comment_id": {
-     "description": "updates a comment votes and reponds with the updated comment object",
+     "description": "updates a comment votes and responds with the updated comment object",
       "exampleResponse": { "comment": {
         "comment_id": 1,
         "author": "butter_bridge",
