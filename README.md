@@ -1,28 +1,24 @@
 # Naomi's Northcoders News API
 
+This project is a mock news website with interlinked users, topics, articles and comments.
+
 ## Getting Started
 
 ## Step 1 - Fork and Clone
-Pre-requisites: node.js, PostgreSQL
+Pre-requisites: node.js 12.5.0, PostgreSQL 10.10
 
 ## Step 2 - Install dependencies
-You will need to install express, knex and pg as dependencies with the following command:
 
-```bash
-npm i express knex pg
+You will need to install the following dependencies:
+* chai
+* chai-sorted
+* mocha
+* supertest 
+* express
+* knex 
+* pg
 
-```
 
-You will need to install chai, chai-sorted, mocha and supertest at developer-dependencies with the following command:
-```bash
-npm i -D mocha chai chai-sorted supertest
-
-```
-or for everything:
-```bash
-npm i 
-
-```
 
 ## Step 3 - Create knexfile 
 You will need to create a knexfile. Make sure to add it to `.gitignore`.

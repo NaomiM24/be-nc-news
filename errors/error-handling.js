@@ -3,7 +3,6 @@ exports.customErrors = (err, req, res, next) => {
   else next(err)
 }
 exports.psqlErrors = (err, req, res, next) => {
- // console.log(err)
   const psqlRef= {
     "22P02" : {
       status: 400,
