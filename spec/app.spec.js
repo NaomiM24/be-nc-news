@@ -141,14 +141,14 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    it('GET: 200, returns an array of article objects', () => {
+    it.only('GET: 200, returns an array of article objects', () => {
       return request(app)
       .get('/api/articles')
       .expect(200)
       .then(({body}) => {
         expect(body.articles).to.be.an('array')
         expect(body.articles[0]).to.contain.keys(
-          'article_id', 'title', 'topic', 'author', 'created_at', 'comment_count'
+          'article_id', 'title', 'topic', 'author', 'created_at', 'comment_count', 'votes'
         )
       })
     })

@@ -69,7 +69,7 @@ exports.fetchArticles = ({sort_by = 'created_at', order = 'desc', author, topic}
   let orderOptions = ['asc', 'desc']
   if (orderOptions.includes(order)){
   return connection
-  .select('articles.article_id', 'title', 'topic', 'articles.author', 'articles.created_at')
+  .select('articles.article_id', 'title', 'topic', 'articles.author', 'articles.created_at', 'articles.votes')
   .from('articles')
   .orderBy(sort_by, order)
   .modify((query) => {
