@@ -2,7 +2,7 @@ module.exports = [
   {
     username: 'tickle122',
     name: 'Tom Tickle',
-    avatar_url: 'https://cached.imagescaler.hbpl.co.uk/resize/scaleWidth/743/cached.offlinehbpl.hbpl.co.uk/news/OMC/DE98A956-A536-5DE4-C6D91DD49E54069A.jpg',
+    avatar_url: 'https://odo.imgix.net/media/catalog/product/d/o/download_10_3_1.png?auto=compress%2Cformat&bg=fff&fit=fillmax&h=256&or=0&w=256',
   },
   {
     username: 'grumpy19',
