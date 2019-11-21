@@ -141,7 +141,7 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    it.only('GET: 200, returns an array of article objects', () => {
+    it('GET: 200, returns an array of article objects', () => {
       return request(app)
       .get('/api/articles')
       .expect(200)
